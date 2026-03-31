@@ -1,0 +1,40 @@
+name: Sync to NewCleus Core
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_id:
+        description: "Public Issue ID to sync"
+        required: true
+      triage_note:
+        description: "Internal justification for promotion"
+        required: true
+        default: "High value feedback for compression algo"
+
+jobs:
+  archive-feedback:
+    name: "Promote to Internal Core"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Internal Core Repo
+        uses: actions/checkout@v4
+        with:
+          repository: whooli/newcleus-core-v3
+          token: ${{ secrets.WHOOLI_INT_PAT }}
+          fetch-depth: 0
+
+      - name: Append to Feedback Log
+        shell: bash
+        run: |
+          git config user.name "Whooli Sync Bot"
+          git config user.email "bot@whooli.invalid"
+          TIMESTAMP=$(date +%Y-%m-%d)
+          echo "Processing promotion for Public Issue #${{ github.event.inputs.issue_id }}..."
+          mkdir -p feedback/
+          echo "| $TIMESTAMP | #${{ github.event.inputs.issue_id }} | ${{ github.event.inputs.triage_note }} |" >> feedback/external_feedback.md
+          echo "Log updated. Committing to Core..."
+          git add feedback/external_feedback.md
+          git commit -m "Promote public issue #${{ github.event.inputs.issue_id }} to Core"
+          git push origin main
+          echo "Sync to NewCleus Core completed."

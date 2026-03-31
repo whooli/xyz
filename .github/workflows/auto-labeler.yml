@@ -1,0 +1,62 @@
+name: NewCleus Triage Bot
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  whooli-triage:
+    name: "AI Triage & Sanitation"
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Sanitize Logs
+        shell: bash
+        run: |
+          IGNORE_KEYWORDS=("test" "debug" "ignore" "dry-run" "pied-piper")
+          set +e
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+          ISSUE_BODY="${{ github.event.issue.body }}"
+          set -e
+          FULL_TEXT="$ISSUE_TITLE $ISSUE_BODY"
+          echo "Scanning content for prohibited test patterns..."
+          for ignore_word in "${IGNORE_KEYWORDS[@]}"; do
+            if echo "$FULL_TEXT" | grep -iq "$ignore_word"; then
+              echo "Inefficiency detected: '$ignore_word'. Skipping triage."
+              exit 0
+            fi
+          done
+
+      - name: Analyze Relevance
+        if: success()
+        shell: bash
+        run: |
+          PRIORITY_KEYWORDS=("critical" "severe" "urgent" "blocker" "security" "compression")
+          set +e
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+          ISSUE_BODY="${{ github.event.issue.body }}"
+          set -e
+          FULL_TEXT="$ISSUE_TITLE $ISSUE_BODY"
+          IS_PRIORITY="false"
+          echo "Ingesting content for sentiment analysis..."
+          for keyword in "${PRIORITY_KEYWORDS[@]}"; do
+            if echo "$FULL_TEXT" | grep -iq "$keyword"; then
+              echo "Critical vector identified: $keyword"
+              IS_PRIORITY="true"
+              break
+            fi
+          done
+          if [ "$IS_PRIORITY" = "true" ]; then
+            echo "Escalating to Whooli Core Team..."
+            gh issue edit "${{ github.event.issue.number }}" --add-label "high-priority"
+            if ! gh issue view "${{ github.event.issue.number }}" --comments | grep -q "marked as high priority"; then
+              gh issue comment "${{ github.event.issue.number }}" --body "🤖 **Whooli Bot**: We have detected critical optimization potential in this request. Marked as **high priority**."
+            fi
+          fi

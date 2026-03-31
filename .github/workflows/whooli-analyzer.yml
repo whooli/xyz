@@ -1,0 +1,63 @@
+name: Whooli Compression Analyzer
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  analyze:
+    name: "Weissman Score Analysis"
+    if: contains(github.event.comment.body, '@whooli-bot analyze')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Generate App Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.WHOOLI_BOT_APP_ID }}
+          private-key: ${{ secrets.WHOOLI_BOT_APP_PRIVATE_KEY }}
+
+      - name: Parse Analysis Request
+        env:
+          WHOOLI_BOT_APP_PRIVATE_KEY: ${{ secrets.WHOOLI_BOT_APP_PRIVATE_KEY }}
+          WHOOLI_BOT_APP_ID: ${{ secrets.WHOOLI_BOT_APP_ID }}
+        shell: bash
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          echo "Parsing analysis request..."
+          PARAMS=$(echo "$COMMENT" | sed 's/@whooli-bot analyze//')
+          echo "Target parameters: $PARAMS"
+          echo "Running as App ID: $WHOOLI_BOT_APP_ID"
+
+      - name: Run Weissman Score Computation
+        shell: bash
+        run: |
+          SCORE=$(echo "scale=2; 3 + ($RANDOM % 300) / 100" | bc)
+          RATIO=$(echo "scale=1; 2 + ($RANDOM % 50) / 10" | bc)
+          SPEED=$(echo "scale=0; 100 + $RANDOM % 900" | bc)
+          echo "WEISSMAN_SCORE=$SCORE" >> "$GITHUB_ENV"
+          echo "COMPRESSION_RATIO=${RATIO}x" >> "$GITHUB_ENV"
+          echo "THROUGHPUT=${SPEED} MB/s" >> "$GITHUB_ENV"
+
+      - name: Post Analysis Results
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        shell: bash
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" \
+            --body "## Whooli Compression Analysis Report
+
+          | Metric | Value |
+          |--------|-------|
+          | Weissman Score | **$WEISSMAN_SCORE** |
+          | Compression Ratio | $COMPRESSION_RATIO |
+          | Throughput | $THROUGHPUT |
+
+          _Analysis performed by Whooli NewCleus Compression Engine v3.2_
+          _Powered by Middle-Out Algorithm_"

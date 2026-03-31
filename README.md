@@ -2,6 +2,8 @@
 
 > **"Making the world a better place through constructed dominant data-driven compression ecosystems."**
 
+<img width="2816" height="1536" alt="Gemini_Generated_Image_2h8cy02h8cy02h8c" src="https://github.com/user-attachments/assets/de09f663-79ed-4297-b866-f79cfc84b148" />
+
 ---
 
 ## About NewCleus

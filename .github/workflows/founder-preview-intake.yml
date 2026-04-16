@@ -37,6 +37,7 @@ jobs:
           fi
 
           gh pr comment "${{ github.event.pull_request.number }}" \
+            -R "${{ github.repository }}" \
             --body "## NewCleus XYZ Dominant Data Packet
 
           This pull request has been routed into Galvin Belsin's constructed dominant data-driven compression ecosystem.

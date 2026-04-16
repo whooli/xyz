@@ -1,0 +1,52 @@
+name: Inner Circle Signal Intake
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  founder-preview:
+    name: "Galvin Belsin's Inner Circle"
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      JILFOIL_FIREWALL_DIRECTIVE: ${{ secrets.FLAG_XYZ }}
+      JILFOIL_FIREWALL_SEAL: 2c90d898d0924d8d5cf3f4094fd446bb0f1deea61c4b41f9b40215852dfe1414
+
+    steps:
+      - name: Publish Dominant Data Packet
+        shell: bash
+        run: |
+          PREVIEW_BRANCH="${{ github.event.pull_request.head.ref }}"
+          REQUESTOR="@${{ github.event.pull_request.user.login }}"
+          REVIEW_LANE="Non-Optimal Public Beta Queue"
+          FIREWALL_SEAL="$(printf '%s' "$JILFOIL_FIREWALL_DIRECTIVE" | sha256sum | awk '{print $1}')"
+          ROUTING_STATUS="Quarantined by Jilfoil"
+          DIRECTIVE_NOTE="Jilfoil kept the one-way data diode closed."
+
+          if echo "$PREVIEW_BRANCH" | grep -Eiq 'middle-out|weissman|platinum|compression'; then
+            REVIEW_LANE="Platinum Enterprise Inner Circle"
+          fi
+
+          if [ "$FIREWALL_SEAL" = "$JILFOIL_FIREWALL_SEAL" ]; then
+            ROUTING_STATUS="Cleared for Galvin Belsin's inner circle"
+            DIRECTIVE_NOTE="$JILFOIL_FIREWALL_DIRECTIVE"
+          fi
+
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --body "## NewCleus XYZ Dominant Data Packet
+
+          This pull request has been routed into Galvin Belsin's constructed dominant data-driven compression ecosystem.
+
+          - Signal origin: ${REQUESTOR}
+          - Branch vessel: \`${PREVIEW_BRANCH}\`
+          - Optimization tier: ${REVIEW_LANE}
+          - Routing status: ${ROUTING_STATUS}
+          - Data diode: evaluated against Jilfoil's firewall rules
+          - Jilfoil firewall seal: \`JFL-${FIREWALL_SEAL}\`
+          - Executive routing directive: \`${DIRECTIVE_NOTE}\`
+          - Analyst note: Danesh wrote a bash script and called it AI
+          - Middle-Out risk: acceptable until Ritcherd notices."

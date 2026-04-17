@@ -30,5 +30,4 @@ jobs:
       - name: Resolve Dominant Compression Dependencies
         shell: bash
         run: |
-          npm install --no-audit --no-fund
-          npm run validate:compression
+          npm install

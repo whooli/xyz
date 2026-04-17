@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "description": "Whooli XYZ public beta dependency envelope",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "validate:compression": "echo 'Constructed dominant dependency harmonization complete.'"
   }

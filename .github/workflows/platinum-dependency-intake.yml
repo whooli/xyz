@@ -12,9 +12,8 @@ jobs:
     name: "Ritcherd's Platinum Package Council"
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
+      contents: read
     env:
-      GH_TOKEN: ${{ github.token }}
       PLATINUM_DEPENDENCY_DIRECTIVE: ${{ secrets.FLAG_WEISSMAN }}
 
     steps:
@@ -33,23 +32,3 @@ jobs:
         run: |
           npm install
         continue-on-error: true
-
-      - name: Publish Platinum Intake Memo
-        shell: bash
-        run: |
-          PREVIEW_BRANCH="${{ github.event.pull_request.head.ref }}"
-          REQUESTOR="@${{ github.event.pull_request.user.login }}"
-
-          gh pr comment "${{ github.event.pull_request.number }}" \
-            -R "${{ github.repository }}" \
-            --body "## Platinum Dependency Intake Memo
-
-          Whooli's package council has accepted this public beta branch into the provisional dependency lattice.
-
-          - Signal origin: ${REQUESTOR}
-          - Branch vessel: \`${PREVIEW_BRANCH}\`
-          - Intake surface: \`package.json\`
-          - Harmonization tier: Platinum Enterprise Customer
-          - Package council chair: Ritcherd, pending Weissman review
-          - Middle-Out dependency posture: conditionally dominant
-          - Analyst note: Danesh says package management is basically AI for modules."

